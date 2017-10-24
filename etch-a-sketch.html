@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Etch-A-Sketch</title>
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet"> 
+    <style type="text/css">
+    body{
+        background: #74e3ec; /* Old Browsers */
+        background: -webkit-linear-gradient(top,#74e3ec,#c7ffe2); /*Safari 5.1-6*/
+        background: -o-linear-gradient(top,#74e3ec,#c7ffe2); /*Opera 11.1-12*/
+        background: -moz-linear-gradient(top,#74e3ec,#c7ffe2); /*Fx 3.6-15*/
+        background: linear-gradient(to bottom, #74e3ec, #c7ffe2); /*Standard*/
+    }
+    h1{
+        font-family: 'Indie Flower', cursive;
+        font-size: 60px;
+        color: white;
+        text-align: center;
+        margin-top: 3%;
+        margin-bottom: 0;
+    }
+    #controls{
+        width: 600px;
+        padding: 5px;
+        margin: 0 auto;
+        margin-bottom: 3%;
+    }
+    #container{
+        height: 480px;
+        width: 480px;
+        border: 1px solid black;
+        background-color: white;
+        margin: 0 auto;
+        -webkit-box-shadow: 7px 7px 5px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 7px 7px 5px 0px rgba(0,0,0,0.75);
+        box-shadow: 7px 7px 5px 0px rgba(0,0,0,0.75);
+        margin-bottom: 5%;
+    }
+    button{
+        margin-left: 5%;
+    }
+    input{
+        margin-right: 5%;
+        width: 15px;
+    }
+    #clear{
+        display: none;
+    }
+</style>
+</head>
+<body>
+    <h1>Etch-a-Sketch</h1>
+    <div id="controls">
+        <div>
+            <div>
+                <label for="length">Square length:</label>
+                <input type="text" id="length">
+                Transition type:
+                <select>
+                    <option value="w2b" selected>White to black</option>
+                    <option value="random_colour">Random colour</option>
+                    <option value="trail">Colour trail</option>
+                    <option value="snake">Snake</option>
+                </select>
+                <button type="button" id="start">Start</button>
+                <button type="button" id="clear">Clear</button>
+            </div>
+        </div>
+    </div>
+    <div id="container"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="etch-a-sketch.js"></script>
+</body>
+</html>
