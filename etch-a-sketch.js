@@ -13,8 +13,11 @@ var colour_number = 1;
 var colour_index = 0;
 var rows = 0, cols = 0;
 var timer = null;
+var col_objects = [], cascade_timers = [];
+var selected_function = null;
 
 function create_grid(length){
+    rows = 0;
     $('#container').html('');
     for (var i = 0; i < length; i++){
         var $row = $('<div></div>');
@@ -26,7 +29,7 @@ function create_grid(length){
             var $cell = $('<div></div>');
             $cell.css({
                 'height': '100%',
-                'width': '' + (width / length) + 'px',
+                'width': '' + ((width / length) - 2) + 'px',
                 'display': 'inline-block',
                 'background-colour': 'rgb(255, 255, 255)'
             });
@@ -56,11 +59,15 @@ function w2b(){
 }
 
 function random_colour(){
+    var colour_string = get_random_bgc();
+    $(this).css('background', colour_string);
+}
+
+function get_random_bgc() {
     var red = 255 - (Math.floor(Math.random() * 255));
     var green = 255 - (Math.floor(Math.random() * 255));
     var blue = 255 - (Math.floor(Math.random() * 255));
-    var colour_string = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
-    $(this).css('background', colour_string);
+    return ('rgb(' + red + ', ' + green + ', ' + blue + ')');
 }
 
 function trail(){
@@ -105,30 +112,110 @@ function snake(){
     }, 300);
 }
 
+function dance() {
+    timer = setInterval(function(){
+        for (var i = 0; i < rows; i++) {
+            for (var j = 0; j < rows; j++) {
+                var coord = '' + i + '-' + j;
+                var $cell = $('div[coord="' + coord + '"');
+                var colour = get_random_bgc();
+                $cell.css('background', colour);
+            }
+        }
+    }, 400);
+}
+
+function cascade(){
+    num_timers_created = 0
+    col_objects = [];
+    timer = setInterval(function(){
+        var col_index = num_timers_created;
+        var col_object = {
+            'row_number': 0,
+            'colour_number': col_index + 1,
+            'colour_index': 0,
+        }
+        col_objects.push(col_object);
+        col_timer = setInterval(row_cascade, 500, col_index);
+        cascade_timers.push(col_timer);
+        num_timers_created += 1
+        if (num_timers_created === rows) {
+            clearInterval(timer);
+        }
+    }, 500);
+}
+
+function row_cascade(col_index){
+    var col_values = col_objects[col_index]
+    var row = col_values['row_number'];
+    var colour = get_col_colour(col_values, col_index);
+    var coord = '' + row + '-' + col_index;
+    var $cell = $('div[coord="' + coord + '"');
+    $cell.css('background', colour);
+    row += 1
+    if (row === rows){
+        col_values['row_number'] = 0;
+    } else {
+        col_values['row_number'] = row;
+    }
+    col_objects[col_index] = col_values;
+}
+
+function get_col_colour(col_values, col_index){
+    console.log(col_values);
+    var colour_number = col_values['colour_number'];
+    var colour_index = col_values['colour_index'];
+    var colour_list = colours[colour_number];
+    console.log(colour_list);
+    var colour = colour_list[colour_index];
+    if (colour_index === (colour_list.length - 1)){
+        col_values['colour_index'] = 0;
+        col_values['colour_number'] = (colour_number === 7 ? 1 : colour_number + 1);
+    } else {
+        col_values['colour_index'] += 1;
+    }
+    col_objects[col_index] = col_values;
+    return colour;
+}
+
 $(function(){
     var colour_change_function = {
         'w2b': w2b,
         'random_colour': random_colour,
         'trail': trail,
-        'snake': snake
+        'snake': snake,
+        'dance': dance,
+        'cascade': cascade
     }
     $('#length').val('4');
 
     $('#clear').click(function(){
-        clearInterval(timer);
+        if (selected_function === cascade){
+            cascade_timers.forEach(function(timer){
+                clearInterval(timer);
+            });
+        } else {
+            clearInterval(timer);
+        }
     });
 
     $('#start').click(function(){
         clearInterval(timer);
-        var cell_hover = colour_change_function[$('select').val()];
+        selected_function = colour_change_function[$('select').val()];
         var length = parseInt($('#length').val());
         create_grid(length);
         $('.cell').css('background-colour', 'rgb(255, 255, 255)');
-        if (cell_hover === snake){
+        if (selected_function === snake){
             snake();
             $('#clear').show();
+        } else if (selected_function === dance){
+            dance();
+            $('#clear').show();
+        } else if (selected_function === cascade){
+            cascade();
+            $('#clear').show();
         } else {
-            $('.cell').hover(cell_hover, function(){});
+            $('.cell').hover(selected_function, function(){});
         }
     });
-}); 
+});
